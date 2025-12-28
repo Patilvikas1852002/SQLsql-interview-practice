@@ -5,12 +5,11 @@
 This repository contains my SQL practice work using real-world datasets.
 The goal is to strengthen SQL skills for Data Analyst interviews.
 
-# Dataset Used
-- Churn Modelling Dataset (Bank customers)
+
 
 # Objectives
-- Practice SQL queries from basic to intermediate level
-- Analyze customer churn behavior
+- Practice SQL queries from basic to intermediate and advance level
+
 
 
 # Tools
