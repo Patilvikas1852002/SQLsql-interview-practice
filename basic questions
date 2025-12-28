@@ -1,0 +1,42 @@
+create database keggle;
+use keggle;
+select * from churn_modelling
+
+describe churn_modelling
+
+-- BASIC SQL QUESTIONS
+
+-- Display all customer records.
+select * from churn_modelling
+
+-- Show only customers from France.
+select * from churn_modelling
+where geography='France'
+
+-- Count the total number of customers.
+select count(*) as total_number from churn_modelling
+
+-- Find all customers who have churned (Exited = 1).
+select * from churn_modelling
+where Exited = 1;
+
+-- List customers whose balance is zero.
+select * from churn_modelling
+where balance=0
+
+-- Display distinct countries available in the dataset.
+select distinct geography from churn_modelling
+
+-- Find customers with credit score greater than 700.
+select * from churn_modelling
+where creditscore>700
+
+-- Count number of male and female customers.
+select gender,count(*) as total_count from churn_modelling
+group by gender
+
+
+
+
+
+
