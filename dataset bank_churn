@@ -1,0 +1,22 @@
+-- Database and table creation
+CREATE DATABASE kaggle;
+USE kaggle;
+
+CREATE TABLE churn_modelling (
+    RowNumber INT,
+    CustomerId INT,
+    Surname VARCHAR(50),
+    CreditScore INT,
+    Geography VARCHAR(20),
+    Gender VARCHAR(10),
+    Age INT,
+    Tenure INT,
+    Balance DOUBLE,
+    NumOfProducts INT,
+    HasCrCard INT,
+    IsActiveMember INT,
+    EstimatedSalary DOUBLE,
+    Exited INT
+);
+
+-- INSERT statements (sample or full dataset)
