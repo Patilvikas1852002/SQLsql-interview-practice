@@ -1,0 +1,53 @@
+ INTERMEDIATE SQL QUESTIONS
+
+-- Find average credit score for each country.
+select geography,avg(creditscore) from churn_modelling
+group by geography
+
+-- Count number of customers in each country.
+select geography, count(*) as total_customer from churn_modelling
+group by geography
+
+
+-- Find country-wise churn count.
+select geography, count(*) as total_churn
+from churn_modelling
+where exited = 1
+group by geography;
+
+
+-- Display average balance for churned vs non-churned customers.
+select exited, avg(balance)
+from churn_modelling
+group by exited;
+
+
+-- Find customers whose age is above average age.
+select * from churn_modelling
+ where age>(select avg(age) from churn_modelling)
+ 
+-- Show average salary of active and inactive members.
+select IsActiveMember, avg(EstimatedSalary) as avg_salary
+from churn_modelling
+group by IsActiveMember;
+
+
+-- Find customers having more than 1 product.
+select * from churn_modelling
+where NumOfProducts > 1;
+
+
+-- Count customers who have a credit card.
+select count(*) as credit_card_customers
+from churn_modelling
+where HasCrCard = 1;
+
+-- Find minimum, maximum, and average balance.
+select min(balance) as min_balance,
+		max(balance) as max_balance,
+        avg(balance) as avg_balance
+        from churn_modelling
+        
+-- Display customers who joined the bank for more than 5 years (Tenure > 5).
+select * from churn_modelling
+where tenure >5;
