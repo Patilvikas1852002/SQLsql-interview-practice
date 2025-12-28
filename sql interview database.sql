@@ -65,7 +65,7 @@ select * from orders;
 select * from payments;
 select * from products;
 
--- BASIC (TCS, Mahindra, Infosys)
+-- BASIC 
 
 -- Q1. Display customer name, city, and signup date
 
@@ -81,7 +81,7 @@ WHERE CITY='MUMBAI';
 -- Q4. Show total number of orders placed
 SELECT COUNT(*) AS TOTAL_NUMBER_OF_ORDERS FROM ORDERS
 
-🟡 MEDIUM QUESTIONS
+ MEDIUM QUESTIONS
 
 -- Q5. Find total amount spent by each customer
 SELECT c.customer_name,c.customer_id,sum(p.price*o.quantity) as total_amt from customers c join  orders o
@@ -123,7 +123,7 @@ join products p on o.product_id=p.product_id
 group by category;
 
 
--- 🔥 NEXT ROUND (ADVANCED – Amazon, Uber, PayPal)
+--  NEXT ROUND (ADVANCED )
 
 -- Choose ONE to continue:
 
