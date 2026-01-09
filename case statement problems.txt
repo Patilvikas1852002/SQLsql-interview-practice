@@ -1,0 +1,161 @@
+DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS orders;
+
+create database case_problems;
+use case_problems
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    department VARCHAR(50),
+    salary INT,
+    experience_years INT
+);
+
+INSERT INTO employees VALUES
+(1, 'Alice', 'IT', 80000, 5),
+(2, 'Bob', 'HR', 45000, 2),
+(3, 'Charlie', 'Finance', 120000, 10),
+(4, 'David', 'IT', 60000, 3),
+(5, 'Eva', 'Finance', 95000, 7),
+(6, 'Frank', 'HR', 30000, 1);
+
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    order_amount INT,
+    order_status VARCHAR(20)
+);
+
+INSERT INTO orders VALUES
+(101, 'John', 500, 'Delivered'),
+(102, 'Emma', 1500, 'Pending'),
+(103, 'Liam', 3000, 'Delivered'),
+(104, 'Olivia', 700, 'Cancelled'),
+(105, 'Noah', 2500, 'Pending');
+
+
+
+-- PRACTICE QUESTIONS (CASE STATEMENT)
+-- Employees Table
+
+-- Write a query to display emp_name, salary and a column salary_level:
+-- salary ≥ 100000 → 'High'
+-- salary between 60000 and 99999 → 'Medium'
+-- salary < 60000 → 'Low'
+
+SELECT emp_name,salary,
+CASE 
+	WHEN salary>=100000 THEN "High" 
+    WHEN salary between 60000 and 99999 THEN "Medium"
+    WHEN salary <60000 THEN "Low"
+    END as salary_level
+    FROM employees;
+
+-- Display emp_name, experience_years and experience_level:
+-- ≥ 8 years → 'Senior'
+-- 4–7 years → 'Mid-Level'
+-- < 4 years → 'Junior'
+SELECT emp_name,experience_years,
+	CASE
+		WHEN experience_years>=8 THEN 'Senior'
+		WHEN experience_years BETWEEN 4 AND 7 THEN 'Mid-Level'
+		WHEN  experience_years<4 THEN 'junior'
+    END as experience_level
+    from employees
+
+-- Display emp_name, department, and a new column bonus_percentage:
+-- IT → 20%
+-- Finance → 25%
+-- HR → 15%
+-- Others → 10%
+SELECT emp_name,department,
+CASE
+	WHEN department="IT" THEN "20%"
+    WHEN department="Finance" THEN "25%"
+    WHEN department="HR" THEN "15%"
+    ELSE "10%"
+    END AS bonus_percentage
+    from  employees
+-- Show emp_name and salary_after_hike:
+-- If experience ≥ 5 years → salary + 10%
+-- Else → salary + 5%
+SELECT emp_name,
+       salary,
+       CASE
+           WHEN experience_years >= 5 THEN salary * 1.10
+           ELSE salary * 1.05
+       END AS salary_after_hike
+FROM employees;
+
+
+
+
+
+
+-- Categorize employees as:
+-- IT with salary ≥ 70000 → 'Top IT Performer'
+-- Finance with salary ≥ 90000 → 'Top Finance Performer'
+-- Others → 'Regular Employee'
+
+SELECT emp_name, department,
+       salary,
+	CASE
+		WHEN  department="IT" AND salary>=70000 THEN 'Top IT Performer'
+        WHEN department="finance" and salary>=90000 THEN 'Top Finance Performer'
+        ELSE "regular employee"
+        END as Categorize_employee
+        from employees
+
+#Orders Table
+
+-- Display order_id, order_amount and order_size:
+-- ≥ 2500 → 'Large Order'
+-- 1000–2499 → 'Medium Order'
+-- < 1000 → 'Small Order'
+SELECT order_id, order_amount,
+	CASE
+		WHEN order_amount>= 2500 THEN "Large Order"
+        WHEN order_amount BETWEEN 1000 AND 2499 THEN "medium Order"
+		WHEN order_amount<1000 THEN "small Order"
+        END AS order_size
+        from orders
+
+-- Show order_id, order_status and delivery_message:
+-- Delivered → 'Order Completed'
+-- Pending → 'Order In Progress'
+-- Cancelled → 'Order Cancelled'
+
+select order_id, order_status,
+CASE
+	WHEN order_status="Delivered" THEN 'Order Completed'
+    WHEN order_status="Pending" THEN 'Order In Progress'
+    WHEN order_status="Cancelled" THEN 'Order Cancelled'
+    END AS delivery_message
+    FROM orders
+
+
+
+-- Display customer_name, order_amount and discount:
+-- order_amount ≥ 3000 → 20%
+-- order_amount ≥ 1500 → 20%
+-- Else → 0%
+select customer_name, order_amount,
+CASE
+	WHEN order_amount >= 3000 THEN "20%"
+	WHEN order_amount>= 1500 THEN "20%"
+    ELSE "0%"
+    END AS discount
+FROM orders
+
+-- Show only Delivered and Pending orders and add a column priority:
+-- Delivered → 'Low Priority'
+-- Pending → 'High Priority'
+SELECT order_id,
+       order_status,
+       CASE
+           WHEN order_status = 'Delivered' THEN 'Low Priority'
+           WHEN order_status = 'Pending' THEN 'High Priority'
+       END AS priority
+FROM orders
+WHERE order_status IN ('Delivered', 'Pending');
