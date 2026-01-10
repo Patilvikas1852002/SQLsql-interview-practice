@@ -1,0 +1,310 @@
+<<<<<< *BASIC TO ADVANCE SQL PROBLEM SOLVING IN ONE-SHOT* >>>>>>>>>>>>>>>>
+
+-- Create Database
+CREATE DATABASE sql_practice5;
+USE sql_practice5;
+
+-- Customers table
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    email VARCHAR(100),
+    city VARCHAR(50),
+    signup_date DATE
+);
+
+-- Products table
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    price DECIMAL(10,2)
+);
+
+-- Orders table
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    status VARCHAR(20),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+-- Order Items table
+CREATE TABLE order_items (
+    order_item_id INT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+-- Insert Customers
+INSERT INTO customers VALUES
+(1, 'Alice', 'alice@mail.com', 'New York', '2023-01-10'),
+(2, 'Bob', 'bob@mail.com', 'Chicago', '2023-02-15'),
+(3, 'Charlie', 'charlie@mail.com', 'New York', '2023-03-05'),
+(4, 'Diana', 'diana@mail.com', 'Boston', '2023-04-01'),
+(5, 'Evan', 'evan@mail.com', 'Chicago', '2023-04-20');
+
+-- Insert Products
+INSERT INTO products VALUES
+(101, 'Laptop', 'Electronics', 1200.00),
+(102, 'Phone', 'Electronics', 800.00),
+(103, 'Tablet', 'Electronics', 500.00),
+(104, 'Headphones', 'Accessories', 150.00),
+(105, 'Keyboard', 'Accessories', 100.00);
+
+-- Insert Orders
+INSERT INTO orders VALUES
+(1001, 1, '2023-05-01', 'Completed'),
+(1002, 2, '2023-05-03', 'Completed'),
+(1003, 1, '2023-05-10', 'Cancelled'),
+(1004, 3, '2023-05-12', 'Completed'),
+(1005, 4, '2023-05-15', 'Pending'),
+(1006, 5, '2023-05-18', 'Completed');
+
+-- Insert Order Items
+INSERT INTO order_items VALUES
+(1, 1001, 101, 1),
+(2, 1001, 104, 2),
+(3, 1002, 102, 1),
+(4, 1002, 105, 1),
+(5, 1003, 103, 1),
+(6, 1004, 101, 1),
+(7, 1004, 105, 2),
+(8, 1005, 104, 1),
+(9, 1006, 102, 2),
+(10, 1006, 103, 1);
+
+
+
+-- 🟢 BASIC SQL PRACTICE QUESTIONS
+-- Display all customers.
+select * from customers;
+
+-- Show customer names and cities only.
+select customer_name,city from customers;
+
+-- List all products with price greater than 500.
+select product_name from products
+where price>500;
+
+-- Find all customers from Chicago.
+select  * from customers
+where city="Chicago";
+
+-- Display all orders with status Completed.
+select * from orders
+where status="Completed";
+
+-- Show unique cities from customers table.
+select distinct city from customers;
+
+-- Sort products by price in descending order.
+select product_name,price from products
+order by price desc;
+
+-- Count total number of customers.
+select count(*) from customers;
+
+-- Show all orders placed after 2023-05-05.
+select * from orders
+where order_date>"2023-05-05";
+
+-- Display product name and category.
+select product_name,category from products;
+
+-- 🟡 INTERMEDIATE SQL PRACTICE QUESTIONS
+
+-- Find total number of orders placed by each customer.
+select c.customer_id,c.customer_name,count(o.order_id) as total_number from customers c
+left join orders o on c.customer_id=o.customer_id
+group by c.customer_id,c.customer_name;  
+
+
+-- Display customer name along with their order dates.
+select c.customer_name,o.order_date from customers c
+join orders o on c.customer_id=o.customer_id; 
+
+
+-- Find total quantity sold for each product.
+select p.product_name, sum(oi.quantity) as total_quantity
+from products p
+join order_items oi on p.product_id = oi.product_id
+join orders o on o.order_id = oi.order_id
+where o.status = 'Completed'
+group by p.product_name;
+
+
+-- Show customers who have placed more than one order.
+select c.customer_id,c.customer_name,count(o.order_id) as total_number from customers c
+join orders o on c.customer_id=o.customer_id
+group by c.customer_id,c.customer_name
+having count(o.order_id) >1
+
+-- Find total revenue generated per product.
+select p.product_name, sum(p.price * oi.quantity) as total_revenue
+from products p
+join order_items oi on p.product_id = oi.product_id
+join orders o on o.order_id = oi.order_id
+where o.status = 'Completed'
+group by p.product_name;
+
+
+-- Display orders that contain more than one product.
+
+select oi.order_id, count(distinct oi.product_id) as total_products
+from order_items oi
+group by oi.order_id
+having count(distinct oi.product_id) > 1;
+
+
+-- Find average product price by category.
+select  category, avg(price) as avg_price from products
+group by category;
+
+
+
+-- Show customers who never placed an order.
+select c.customer_name,o.order_id from customers c
+left join orders o on c.customer_id=o.customer_id
+where o.order_id is null;
+
+
+
+-- List products that were never ordered.
+select p.product_name,o.order_id from products p
+left join order_items o on p.product_id=o.product_id
+where o.order_id is null;
+
+
+-- Display customer-wise total spending.
+select c.customer_name,
+       sum(p.price * oi.quantity) as total_spending
+from customers c
+join orders o on c.customer_id = o.customer_id
+join order_items oi on oi.order_id = o.order_id
+join products p on p.product_id = oi.product_id
+where o.status = 'Completed'
+group by c.customer_name;
+
+
+
+
+-- 🔵 ADVANCED SQL PRACTICE QUESTIONS
+
+-- Rank customers based on total spending.
+-- Display customer-wise total spending.
+with my_cte as (select c.customer_name,
+       sum(p.price * oi.quantity) as total_spending
+from customers c
+join orders o on c.customer_id = o.customer_id
+join order_items oi on oi.order_id = o.order_id
+join products p on p.product_id = oi.product_id
+where o.status = 'Completed'
+group by c.customer_name)
+select customer_name, total_spending,
+rank() over(order by total_spending desc ) as rnk from my_cte
+
+
+
+
+-- Find the most expensive product ordered in each order.
+SELECT order_id, product_name, price
+FROM (
+    SELECT o.order_id,
+           p.product_name,
+           p.price,
+           ROW_NUMBER() OVER (
+               PARTITION BY o.order_id
+               ORDER BY p.price DESC
+           ) AS rn
+    FROM orders o
+    JOIN order_items oi ON o.order_id = oi.order_id
+    JOIN products p ON p.product_id = oi.product_id
+) t
+WHERE rn = 1;
+
+-- Display the first order date for each customer.
+select c.customer_name,min(o.order_date) as first_order from customers c
+join orders o on c.customer_id=o.customer_id
+group by c.customer_name
+
+-- Find customers whose total purchase amount is above the overall average purchase amount.
+WITH customer_total AS (
+    SELECT c.customer_name,
+           SUM(p.price * oi.quantity) AS total_spending
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    JOIN order_items oi ON oi.order_id = o.order_id
+    JOIN products p ON p.product_id = oi.product_id
+    WHERE o.status = 'Completed'
+    GROUP BY c.customer_name
+)
+SELECT customer_name, total_spending
+FROM customer_total
+WHERE total_spending >
+      (SELECT AVG(total_spending) FROM customer_total);
+
+-- Show month-wise total revenue.
+with cte as (select date_format(o.order_date,'%Y-%M') as monthly, sum(p.price*oi.quantity) as total_revenue from products p
+join order_items oi on p.product_id=oi.product_id
+join orders o on o.order_id=oi.order_id
+group by date_format(o.order_date,'%Y-%M'))
+select monthly,total_revenue from cte order by monthly
+
+-- Find customers who bought products from more than one category.
+SELECT c.customer_name
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_items oi ON oi.order_id = o.order_id
+JOIN products p ON p.product_id = oi.product_id
+WHERE o.status = 'Completed'
+GROUP BY c.customer_name
+HAVING COUNT(DISTINCT p.category) > 1;
+
+-- Identify orders where total order value exceeds 2000.
+SELECT o.order_id,
+       SUM(p.price * oi.quantity) AS order_total
+FROM orders o
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON p.product_id = oi.product_id
+WHERE o.status = 'Completed'
+GROUP BY o.order_id
+HAVING SUM(p.price * oi.quantity) > 2000;
+
+-- Find the top 2 best-selling products by revenue.
+with cte as(select p.product_name, sum(p.price * oi.quantity) as total_revenue
+from products p
+join order_items oi on p.product_id = oi.product_id
+join orders o on o.order_id = oi.order_id
+where o.status = 'Completed'
+group by p.product_name)
+select product_name,total_revenue,
+rank() over(order by total_revenue desc  ) rnk from cte
+  limit 2
+ 
+-- Display customers who placed orders in consecutive dates.
+SELECT DISTINCT customer_name
+FROM (
+    SELECT c.customer_name,
+           o.order_date,
+           LAG(o.order_date) OVER (
+               PARTITION BY c.customer_id
+               ORDER BY o.order_date
+           ) AS prev_date
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+) t
+WHERE DATEDIFF(order_date, prev_date) = 1;
+
+-- Create a query to calculate running total of revenue ordered by date.
+
+with cte as(select o.order_date,sum(p.price*oi.quantity) as total_revenue from customers c
+join orders o on c.customer_id=o.customer_id
+join order_items oi on oi.order_id=o.order_id
+join products p on p.product_id=oi.product_id
+group by o.order_date)
+select order_date,sum(total_revenue) over(order by order_date ) as cummulative_running from cte
