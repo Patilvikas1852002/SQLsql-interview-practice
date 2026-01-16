@@ -1,0 +1,166 @@
+CREATE DATABASE company_db45;
+USE company_db45;
+
+CREATE TABLE departments (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50)
+);
+
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    salary INT,
+    dept_id INT,
+    manager_id INT,
+    hire_date DATE,
+    FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+);
+
+CREATE TABLE projects (
+    project_id INT PRIMARY KEY,
+    project_name VARCHAR(50),
+    dept_id INT,
+    budget INT,
+    FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+);
+
+CREATE TABLE employee_projects (
+    emp_id INT,
+    project_id INT,
+    hours_worked INT,
+    PRIMARY KEY (emp_id, project_id)
+);
+INSERT INTO departments VALUES
+(1, 'IT'),
+(2, 'HR'),
+(3, 'Finance'),
+(4, 'Sales');
+
+INSERT INTO employees VALUES
+(1, 'Alice', 90000, 1, NULL, '2018-01-10'),
+(2, 'Bob', 60000, 1, 1, '2019-03-15'),
+(3, 'Charlie', 70000, 1, 1, '2020-07-01'),
+(4, 'Diana', 65000, 2, NULL, '2017-05-20'),
+(5, 'Eva', 50000, 2, 4, '2021-01-12'),
+(6, 'Frank', 85000, 3, NULL, '2016-02-28'),
+(7, 'Grace', 75000, 3, 6, '2019-10-10'),
+(8, 'Henry', 55000, 4, NULL, '2020-04-18'),
+(9, 'Ivy', 48000, 4, 8, '2022-06-01');
+
+INSERT INTO projects VALUES
+(101, 'Website Revamp', 1, 200000),
+(102, 'Payroll System', 1, 150000),
+(103, 'Hiring Drive', 2, 50000),
+(104, 'Training Program', 2, 40000),
+(105, 'Audit', 3, 100000),
+(106, 'Sales Campaign', 4, 120000);
+
+INSERT INTO employee_projects VALUES
+(1, 101, 50),
+(2, 101, 40),
+(3, 102, 60),
+(1, 102, 30),
+(4, 103, 20),
+(5, 103, 35),
+(4, 104, 40),
+(6, 105, 50),
+(7, 105, 45),
+(8, 106, 60),
+(9, 106, 25);
+
+
+BASIC SUBQUERY PRACTICE (1–10)
+1 Find all employees who earn more than the average salary of all employees.
+select emp_name,salary from employees
+where salary>(select avg(salary) from employees)
+
+2 Find employees whose salary is greater than Bob’s salary.
+select emp_name,salary from employees
+where salary>(select salary from employees
+where emp_name="Bob")
+
+3 Find employees who work in the same department as Alice.
+SELECT e.emp_name, d.dept_name
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE e.dept_id = (
+    SELECT dept_id
+    FROM employees
+    WHERE emp_name = 'Alice'
+);
+
+
+4 Find employees who earn the maximum salary in the company.
+select emp_name,salary from employees
+where salary=(select max(salary) from employees)
+
+5 Find employees who earn less than the average salary.
+select emp_name,salary from employees
+where salary<(select avg(salary) from employees)
+
+6 Find employees who work in the IT department (use subquery to get IT dept_id).
+select emp_name from employees
+where dept_id=(select dept_id from departments
+where dept_name="IT")
+
+7 Find employees who were hired after the earliest hire date.
+SELECT emp_name,hire_date FROM employees
+where hire_date>(select min(hire_date) from employees)
+
+8 Find employees who work in a department that has more than 2 employees.
+SELECT emp_name
+FROM employees e
+WHERE (SELECT COUNT(*)FROM employees
+    WHERE dept_id = e.dept_id
+) > 2;
+
+9 Find employees whose salary is equal to the minimum salary.
+select emp_name,salary from employees
+where salary=(select min(salary) from employees)
+
+10 Find employees who do not belong to the HR department (use subquery).
+select e.emp_name,d.dept_name from employees e join departments d on e.dept_id=d.dept_id
+ where d.dept_id <> (select dept_id from departments where dept_name='HR')
+ 
+ NTERMEDIATE SUBQUERY PRACTICE
+11 Find employees who earn more than the average salary of their department.
+SELECT e.emp_name, e.salary
+FROM employees e
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM employees
+    WHERE dept_id = e.dept_id
+);
+
+
+12 Find employees who work in a department where the average salary is greater than 70,000.
+
+WITH dept_avg AS (
+    SELECT 
+        d.dept_id,
+        d.dept_name,
+        AVG(e.salary) AS avg_salary
+    FROM employees e
+    JOIN departments d 
+        ON e.dept_id = d.dept_id
+    GROUP BY d.dept_id, d.dept_name
+)
+SELECT 
+    e.emp_name,
+    e.salary,
+    da.dept_name,
+    da.avg_salary
+FROM employees e
+JOIN dept_avg da
+    ON e.dept_id = da.dept_id
+WHERE da.avg_salary > 70000;
+
+13 Find departments that have at least one employee earning more than 80,000. 
+SELECT d.dept_id, d.dept_name
+FROM departments d
+WHERE EXISTS (
+    SELECT 1
+    FROM employees e
+    WHERE e.dept_id = d.dept_id
+      AND e.salary > 80000
+);
