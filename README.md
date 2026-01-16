@@ -16,6 +16,7 @@ The goal is to strengthen SQL skills for Data Analyst interviews.
 - MySQL
 - MySQL Workbench
 - Kaggle Dataset
+- work on real world dataset
 
 
 # How to Run
